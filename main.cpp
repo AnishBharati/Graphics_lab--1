@@ -1,113 +1,92 @@
-#include "glad/glad.h"
-#include <GLFW/glfw3.h>
-#include <iostream>
+#include <GL/glut.h>
 #include <cmath>
 
-void framebuffer_size_callback(GLFWwindow *window, int width, int height)
+// function to create lines
+void drawLines()
 {
-    glViewport(0, 0, width, height);
+    glClear(GL_COLOR_BUFFER_BIT); // Clear the color buffer
+
+    glColor3f(1.0, 1.0, 1.0); // make the line color white
+    glBegin(GL_LINES);        // start the line
+
+    // vertical line
+    glVertex2f(-0.25, -0.5); // starting point
+    glVertex2f(-0.25, 0.5);  // end point
+
+    glVertex2f(-0.3, -0.5);
+    glVertex2f(-0.3, 0.5);
+
+    glVertex2f(-0.25, -0.5);
+    glVertex2f(-0.3, -0.5);
+
+    glVertex2f(-0.25, 0.5);
+    glVertex2f(-0.3, 0.5);
+
+    // for U rotating in 60 degree
+    float angle = 60.0 * 3.14159 / 180.0; // degree into radian
+    float dx = cos(angle) * 0.5;          // new x
+    float dy = sin(angle) * 0.5;          // new y
+
+    // drawing the line for U in top
+    glVertex2f(-0.25, 0.0);
+    glVertex2f(dx, dy);
+
+    // double lining for the U in top
+    glVertex2f(-0.25, 0.05);
+    glVertex2f(dx, dy + 0.05);
+
+    // joining both double line in top
+    glVertex2f(dx, dy);
+    glVertex2f(dx, dy + 0.05);
+
+    // for U rotating in negative 60 degree
+    float negangle = -60.0 * 3.14159 / 180.0;
+    float negdx = cos(negangle) * 0.5;
+    float negdy = sin(negangle) * 0.5;
+
+    // drawing line for U in the bottom
+    glVertex2f(-0.25, 0.0);
+    glVertex2f(negdx, negdy);
+
+    // double lining for the U in the bottom
+    glVertex2f(-0.25, -0.05);
+    glVertex2f(negdx, negdy - 0.05);
+
+    // another angle for drawing line starting from the end point of the U in the bottom for making U
+    float x = cos(angle) * 1.414;
+    float y = sin(angle) * 1.414;
+
+    // another line starting from the end of the bottom U
+    glVertex2f(negdx, negdy);
+    glVertex2f(3 * dx, 0);
+
+    // double lining of that end of the bottom U
+    glVertex2f(negdx, negdy - 0.05);
+    glVertex2f(3 * dx, -0.05);
+
+    // joining the lines of the end points of the above line
+    glVertex2f(3 * dx, 0);
+    glVertex2f(3 * dx, -0.05);
+
+    glEnd(); // drawing all these lines
+
+    glFlush(); // Flush the OpenGL pipeline
 }
 
-void drawLine(int x0, int y0, int x1, int y1)
+int main(int argc, char **argv)
 {
-    // BLA implementation
-    int dx = abs(x1 - x0);
-    int dy = abs(y1 - y0);
-    int sx = (x0 < x1) ? 1 : -1;
-    int sy = (y0 < y1) ? 1 : -1;
-    int err = dx - dy;
+    glutInit(&argc, argv);                       // Initialize GLUT
+    glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB); // Set display mode
+    glutInitWindowSize(800, 800);                // Set window size
+    glutInitWindowPosition(100, 100);            // Set window position
+    glutCreateWindow("KU Logo");                 // Create the window
 
-    while (true)
-    {
-        glVertex2i(x0, y0);
+    glClearColor(0.0, 0.0, 0.0, 0.0); // Set clear color to black
 
-        if (x0 == x1 && y0 == y1)
-            break;
-        int e2 = 2 * err;
-        if (e2 > -dy)
-        {
-            err -= dy;
-            x0 += sx;
-        }
-        if (e2 < dx)
-        {
-            err += dx;
-            y0 += sy;
-        }
-    }
-}
+    // Register the display callback function
+    glutDisplayFunc(drawLines);
 
-int main()
-{
-    if (!glfwInit())
-    {
-        std::cerr << "Failed to initialize GLFW\n";
-        return -1;
-    }
+    glutMainLoop(); // Enter the GLUT event processing loop
 
-    GLFWwindow *window = glfwCreateWindow(800, 600, "KU Logo", NULL, NULL);
-    if (!window)
-    {
-        std::cerr << "Failed to create GLFW window\n";
-        glfwTerminate();
-        return -1;
-    }
-
-    glfwMakeContextCurrent(window);
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-    {
-        std::cerr << "Failed to initialize GLAD\n";
-        return -1;
-    }
-
-    glOrtho(0, 800, 0, 600, -1, 1); // Set the coordinate system
-
-    while (!glfwWindowShouldClose(window))
-    {
-        glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
-
-        glPointSize(2.0f); // Set point size
-        glBegin(GL_POINTS);
-        glColor3f(0.0f, 0.0f, 0.0f); // Black color for the lines
-
-        int shiftLeft = 100; // Amount to shift left
-
-        // Adjusted x-coordinate for the vertical line
-        drawLine(400 - shiftLeft, 100, 400 - shiftLeft, 500);
-
-        // Calculate midpoint of the adjusted line
-        float middleX = 400.0f - shiftLeft;
-        float middleY = (100.0f + 500.0f) / 2.0f;
-
-        // Angle calculations remain the same
-        float angle = 45.0f * M_PI / 180.0f;
-        float diagonallength = (500.0f - 100.0f) / 4.0f;
-
-        // Adjust x-coordinates for the diagonal lines
-        float lineendx = middleX + 3 * diagonallength * cos(angle);
-        float lineendy = middleY + 2.5 * diagonallength * sin(angle);
-
-        float neglineendx = middleX + 3 * diagonallength * cos(-angle);
-        float neglineendy = middleY + 2.5 * diagonallength * sin(-angle);
-
-        // Draw adjusted lines
-        drawLine(middleX, middleY, lineendx, lineendy);
-        drawLine(middleX, middleY, neglineendx, neglineendy);
-
-        float lineEndX = neglineendx + 3 * diagonallength * cos(angle);
-        float lineEndY = neglineendy + 2.5 * diagonallength * sin(angle);
-
-        drawLine(neglineendx, neglineendy, lineEndX, lineEndY);
-
-        glEnd();
-
-        glfwSwapBuffers(window);
-        glfwPollEvents();
-    }
-
-    glfwTerminate();
     return 0;
 }
