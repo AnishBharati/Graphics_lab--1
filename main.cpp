@@ -1,92 +1,193 @@
 #include <GL/glut.h>
 #include <cmath>
 
-// function to create lines
-void drawLines()
+// Drawing Circle
+void drawCircle(float centerX, float centerY, float radius)
 {
-    glClear(GL_COLOR_BUFFER_BIT); // Clear the color buffer
+    glBegin(GL_POINTS);
 
-    glColor3f(1.0, 1.0, 1.0); // make the line color white
-    glBegin(GL_LINES);        // start the line
+    float x = radius;
+    float y = 0;
+    float err = 0;
+    while (x >= y)
+    {
+        glVertex2f(centerX + x, centerY + y);
+        glVertex2f(centerX - x, centerY + y);
+        glVertex2f(centerX + x, centerY - y);
+        glVertex2f(centerX - x, centerY - y);
+        glVertex2f(centerX + y, centerY + x);
+        glVertex2f(centerX - y, centerY + x);
+        glVertex2f(centerX + y, centerY - x);
+        glVertex2f(centerX - y, centerY - x);
+
+        if (err <= 0)
+        {
+            y += 1;
+            err += 2 * y + 1;
+        }
+        if (err > 0)
+        {
+            x -= 1;
+            err -= 2 * x + 1;
+        }
+    }
+
+    glEnd();
+}
+
+void display()
+{
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    // circle of radius 200 units
+    glColor3f(1.0, 0.0, 0.0); // Red color
+    glBegin(GL_POLYGON);
+    float an;
+    for (int i = 0; i < 360; i++)
+    {
+        an = i * 3.14159 / 180;
+        glVertex2f(200 * cos(an), 200 * sin(an));
+    }
+    glEnd();
+    drawCircle(0, 0, 200);
+
+    // circle of radius 175 units
+    glColor3f(0.0, 1.0, 1.0); // Blue color
+    glBegin(GL_POLYGON);
+    float a;
+    for (int i = 0; i < 360; i++)
+    {
+        a = i * 3.14159 / 180;
+        glVertex2f(175 * cos(a), 175 * sin(a));
+    }
+    glEnd();
+    drawCircle(0, 0, 175); // Center at (0, 0) with radius 175
+
+    // circle of radius 150 units
+    glColor3f(1.0, 1.0, 0.5); // yellow color
+    glBegin(GL_POLYGON);
+    float ang;
+    for (int i = 0; i < 360; i++)
+    {
+        ang = i * 3.14159 / 180;
+        glVertex2f(150 * cos(ang), 150 * sin(ang));
+    }
+    glEnd();
+
+    drawCircle(0, 0, 150);
+    glColor3f(0.0, 0.0, 0.0); // Set circle color black
+
+    // drawing triangle of light pink
+    glColor3f(1.0, 0.71, 0.76); // Light Pink
+    glBegin(GL_TRIANGLES);
+
+    glVertex2f(-133, 70);
+    glVertex2f(133, 70);
+    glVertex2f(0, -150);
+
+    glEnd();
+
+    // making the logo of KU / making KU
+    glColor3f(0.0, 0.0, 0.0);
+    glLineWidth(10.0);
+    glBegin(GL_LINES);
 
     // vertical line
-    glVertex2f(-0.25, -0.5); // starting point
-    glVertex2f(-0.25, 0.5);  // end point
+    glVertex2f(-20.25, -50.5); // Starting point of the line
+    glVertex2f(-20.25, 50.5);  // End point of the line
 
-    glVertex2f(-0.3, -0.5);
-    glVertex2f(-0.3, 0.5);
+    glVertex2f(-25.25, -50.5); // starting point
+    glVertex2f(-25.25, 50.5);  // ending point
 
-    glVertex2f(-0.25, -0.5);
-    glVertex2f(-0.3, -0.5);
+    glVertex2f(-22.5, -50.5); // starting point
+    glVertex2f(-22.25, 50.5); // ending point
 
-    glVertex2f(-0.25, 0.5);
-    glVertex2f(-0.3, 0.5);
+    glVertex2f(-25.25, 50.5);
+    glVertex2f(-20.25, 50.5);
+
+    glVertex2f(-25.25, -50.5);
+    glVertex2f(-20.25, -50.5);
 
     // for U rotating in 60 degree
     float angle = 60.0 * 3.14159 / 180.0; // degree into radian
-    float dx = cos(angle) * 0.5;          // new x
-    float dy = sin(angle) * 0.5;          // new y
+    float dx = cos(angle) * 50.5;         // new x
+    float dy = sin(angle) * 50.5;         // new y
 
     // drawing the line for U in top
-    glVertex2f(-0.25, 0.0);
+    glVertex2f(-20.25, 0.0);
     glVertex2f(dx, dy);
 
+    glVertex2f(-20.25, 2.75);
+    glVertex2f(dx, dy + 2.75);
+
     // double lining for the U in top
-    glVertex2f(-0.25, 0.05);
-    glVertex2f(dx, dy + 0.05);
+    glVertex2f(-20.25, 5.05);
+    glVertex2f(dx, dy + 5.05);
 
     // joining both double line in top
     glVertex2f(dx, dy);
-    glVertex2f(dx, dy + 0.05);
+    glVertex2f(dx, dy + 5.05);
 
     // for U rotating in negative 60 degree
     float negangle = -60.0 * 3.14159 / 180.0;
-    float negdx = cos(negangle) * 0.5;
-    float negdy = sin(negangle) * 0.5;
+    float negdx = cos(negangle) * 50.5;
+    float negdy = sin(negangle) * 50.5;
 
     // drawing line for U in the bottom
-    glVertex2f(-0.25, 0.0);
+    glVertex2f(-20.25, 0.0);
     glVertex2f(negdx, negdy);
 
-    // double lining for the U in the bottom
-    glVertex2f(-0.25, -0.05);
-    glVertex2f(negdx, negdy - 0.05);
+    glVertex2f(-20.25, -2.75);
+    glVertex2f(negdx, negdy - 2.75);
 
-    // another angle for drawing line starting from the end point of the U in the bottom for making U
-    float x = cos(angle) * 1.414;
-    float y = sin(angle) * 1.414;
+    // double lining for the U in the bottom
+    glVertex2f(-20.25, -5.05);
+    glVertex2f(negdx, negdy - 5.05);
 
     // another line starting from the end of the bottom U
     glVertex2f(negdx, negdy);
     glVertex2f(3 * dx, 0);
 
+    glVertex2f(negdx, negdy - 2.75);
+    glVertex2f(3 * dx, -2.75);
+
     // double lining of that end of the bottom U
-    glVertex2f(negdx, negdy - 0.05);
-    glVertex2f(3 * dx, -0.05);
+    glVertex2f(negdx, negdy - 5.05);
+    glVertex2f(3 * dx, -5.05);
 
     // joining the lines of the end points of the above line
     glVertex2f(3 * dx, 0);
-    glVertex2f(3 * dx, -0.05);
+    glVertex2f(3 * dx, -5.05);
 
-    glEnd(); // drawing all these lines
+    glColor3f(1.0, 1.0, 1.0);
 
-    glFlush(); // Flush the OpenGL pipeline
+    glVertex2f(-132.0, -70.0);
+    glVertex2f(132.0, -70.0);
+
+    float angle1 = 90.0 * 3.14159 / 180.0;
+    float x = cos(angle1) * 175.0;
+    float y = sin(angle) * 175.0;
+
+    glVertex2f(-132.0, -70.0);
+    glVertex2f(x, y);
+
+    glVertex2f(132.0, -70.0);
+    glVertex2f(-x, y);
+
+    glEnd(); // end GL_LINES
+
+    glFlush();
 }
 
 int main(int argc, char **argv)
 {
-    glutInit(&argc, argv);                       // Initialize GLUT
-    glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB); // Set display mode
-    glutInitWindowSize(800, 800);                // Set window size
-    glutInitWindowPosition(100, 100);            // Set window position
-    glutCreateWindow("KU Logo");                 // Create the window
-
-    glClearColor(0.0, 0.0, 0.0, 0.0); // Set clear color to black
-
-    // Register the display callback function
-    glutDisplayFunc(drawLines);
-
-    glutMainLoop(); // Enter the GLUT event processing loop
-
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
+    glutInitWindowSize(1000, 1000);
+    glutCreateWindow("KU Logo");
+    glClearColor(1.0, 1.0, 1.0, 0.0);
+    gluOrtho2D(-250.0, 250.0, -250.0, 250.0);
+    glutDisplayFunc(display);
+    glutMainLoop();
     return 0;
 }
